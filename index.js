@@ -12,20 +12,21 @@ const typeDefinitions = gql`
     NO
   }
   type Address{
-    street:String!
-    city:String!
+    street:String
+    city:String
   }
   type Person { 
     name:String!
     phone:String
-    street:String!
-    address:Address!
+    street:String
+    city:String
+    address:Address
     id: ID!
   }
 
   type Query {
       personCount: Int!
-      allPersons(phone: YesNo): [Person]!
+      allPersons(phone: YesNo): [Person]! 
       findPerson(name: String!): Person
   }
 
@@ -33,12 +34,14 @@ const typeDefinitions = gql`
     addPerson(
       name:String!
       phone:String
-      street:String!
-      city:String!
+      street:String
+      city:String
     ): Person
     editNumber(
-      name:String!
-      phone:String!
+      phone: String!
+      name: String!
+      street: String!
+      city: String!
     ): Person
   }
 `
@@ -61,7 +64,7 @@ const resolvers = {
   },
   Mutation: {
     addPerson: (root, args) => {
-      if(persons.find(p => p.name ===args.name)){
+      if(persons.find(p => p.name === args.name)){
         throw new UserInputError('Name must be unique', {
           invalidArgs: args.name
         })
@@ -76,7 +79,7 @@ const resolvers = {
       
       const person = persons[personIndex]
 
-      const updatePerson = {...person, phone: args.phone}
+      const updatePerson = {...person, phone: args.phone,  city: args.city, street: args.street} 
       persons[personIndex] = updatePerson
 
       return updatePerson
