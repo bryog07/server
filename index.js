@@ -2,9 +2,27 @@ import { ApolloServer,UserInputError, gql} from 'apollo-server'
 import {v1 as uuid} from 'uuid'
 
 
-const persons = [{"name":"Midu","phone":"843-1234567","street":"Street frontend","city":"Barcelona","id":"3d594650-3435-11e3-dc43-3e40fr34s879"},
-        {"name":"Youseff","phone":"843-1231413","street":"Street backend","city":"Madrid","id":"2s394650-3435-11e3-dc43-3e40fr34s129"},
-        {"name":"Itzi","street":"fullstack","city":"Mallorca","id":"99994650-3435-11e3-dc43-3e40fr34s879"}]
+const persons = [{
+    "name":"Midu",
+    "phone":"843-1234567",
+    "street":"Street frontend",
+    "city":"Barcelona",
+    "id":"3d594650-3435-11e3-dc43-3e40fr34s879"
+    },
+  {
+    "name":"Youseff",
+    "phone":"843-1231413",
+    "street":"Street backend",
+    "city":"Madrid",
+    "id":"2s394650-3435-11e3-dc43-3e40fr34s129"
+  },
+
+  {
+    "name":"Itzi",
+    "street":"fullstack",
+    "city":"Mallorca",
+    "id":"99994650-3435-11e3-dc43-3e40fr34s879"
+  }]
 
 const typeDefinitions = gql`
   enum YesNo{
@@ -21,25 +39,26 @@ const typeDefinitions = gql`
     street:String
     city:String
     address:Address
-    id: ID!
+    id: String!
   }
 
   type Query {
       personCount: Int!
-      allPersons(phone: YesNo): [Person]! 
-      findPerson(name: String!): Person
+      allPersons(phone: YesNo): [Person]!
+      findPerson(id: String!): Person
   }
 
   type Mutation {
-    addPerson(
+    addPerson(  
       name:String!
       phone:String
       street:String
       city:String
     ): Person
     editNumber(
+      id:String!
+      name: String
       phone: String!
-      name: String!
       street: String!
       city: String!
     ): Person
@@ -58,8 +77,8 @@ const resolvers = {
         return persons.filter(byPhone)
     },
     findPerson: (root, args) => {
-        const {name} = args
-        return persons.find(person => person.name === name)
+        const {id} = args
+        return persons.find(person => person.id === id)
     }
   },
   Mutation: {
@@ -74,12 +93,12 @@ const resolvers = {
       return person
     },
     editNumber: (root, args) => {
-      const personIndex = persons.findIndex(p => p.name === args.name)
+      const personIndex = persons.findIndex(p => p.id === args.id)
       if (personIndex === -1) return null 
       
       const person = persons[personIndex]
 
-      const updatePerson = {...person, phone: args.phone,  city: args.city, street: args.street} 
+      const updatePerson = {...person, name: args.name, phone: args.phone, city: args.city, street: args.street} 
       persons[personIndex] = updatePerson
 
       return updatePerson
